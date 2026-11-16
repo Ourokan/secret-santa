@@ -402,7 +402,7 @@ function viewOrganizerSignIn() {
   };
   return h("div", {},
     h("div", { class: "hero" },
-      mascot({ size: 170, say: "Ho ho ho-wl!" }),
+      mascot({ size: 170 }),
       h("h1", {}, "Secret Santa, sorted!"),
       h("p", {}, "Type in your group's names, set who shouldn't be paired, choose how many gifts each person gives, and share one link. Everyone taps their name to see their match, once."),
       h("p", { class: "small" }, "Only the organizer signs in. Everyone else just uses the link.")),
@@ -499,7 +499,7 @@ function viewShare() {
   if (e.status !== "drawn") {
     return h("div", { class: "share" }, head,
       h("div", { class: "card empty" },
-        mascot({ size: 130, mood: "sleepy", say: "Zzz…" }),
+        mascot({ size: 130, mood: "sleepy" }),
         h("h2", {}, "Names haven't been drawn yet"),
         h("p", { class: "muted" }, "The organizer is still getting things ready. Check this link again soon!")));
   }
@@ -533,7 +533,7 @@ function viewShare() {
           e.budget && h("span", { class: "chip" }, "💰 " + e.budget),
           e.exchangeDate && h("span", { class: "chip" }, "🗓 " + fmtDate(e.exchangeDate))),
         h("p", { class: "muted small", style: "margin-top:14px" }, `Secret Santa · ${e.name}`),
-        mascot({ size: 110, say: "Shhh! 🤫" })));
+        mascot({ size: 110 })));
   }
 
   // Confirm step
@@ -559,7 +559,7 @@ function viewShare() {
       `You already opened ${nameOf(mineNow)}'s match on this device. Lost your screenshot? Ask the organizer to resend it.`),
     h("div", { class: "card" },
       h("div", { class: "waiting" },
-        mascot({ size: 96, say: "Who are you?" }),
+        mascot({ size: 96 }),
         h("div", {},
           h("h2", { style: "margin:0" }, "Tap your name"),
           h("p", { class: "muted small", style: "margin:0" }, "You'll see who you're getting a gift for. It only opens once, so be ready to screenshot!"))),
