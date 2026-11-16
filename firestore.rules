@@ -4,60 +4,49 @@ service cloud.firestore {
 
     function signedIn() { return request.auth != null; }
     function me() { return request.auth.uid; }
-    function eventData(eid) {
-      return get(/databases/$(database)/documents/events/$(eid)).data;
-    }
+    function isGuest() { return request.auth.token.firebase.sign_in_provider == 'anonymous'; }
+    function eventPath(eid) { return /databases/$(database)/documents/events/$(eid); }
+    function eventData(eid) { return get(eventPath(eid)).data; }
     function isAdmin(eid) { return signedIn() && eventData(eid).adminUid == me(); }
-    function shortStr(v, max) { return v is string && v.size() <= max; }
+    function claimPath(eid, pid) { return /databases/$(database)/documents/events/$(eid)/claims/$(pid); }
 
-    // A group / exchange. The event id is a long random string, so it doubles
-    // as the invite code: anyone signed in with the link can read it.
+    // An exchange. Anyone with the share link can read the name list.
+    // Only the signed-in organizer (not a guest) can create or change it.
     match /events/{eid} {
-      allow get: if signedIn();
+      allow get: if true;
       allow list: if signedIn() && resource.data.adminUid == me();
-      allow create: if signedIn()
+      allow create: if signedIn() && !isGuest()
         && request.resource.data.adminUid == me()
-        && request.resource.data.status == 'open'
-        && shortStr(request.resource.data.name, 100);
-      allow update: if signedIn()
-        && resource.data.adminUid == me()
-        && request.resource.data.adminUid == resource.data.adminUid
-        && shortStr(request.resource.data.name, 100);
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 100;
+      allow update: if signedIn() && resource.data.adminUid == me()
+        && request.resource.data.adminUid == resource.data.adminUid;
       allow delete: if signedIn() && resource.data.adminUid == me();
 
-      // One doc per person, id = their uid. Everyone in the group can see
-      // who is in it and their wishlists.
-      match /participants/{uid} {
-        allow read: if signedIn();
-        allow create: if signedIn() && me() == uid
-          && eventData(eid).status == 'open'
-          && shortStr(request.resource.data.displayName, 60)
-          && shortStr(request.resource.data.wishlist, 2000);
-        allow update: if signedIn() && me() == uid
-          && request.resource.data.diff(resource.data).affectedKeys()
-               .hasOnly(['displayName', 'wishlist', 'viewedAt', 'viewedRound'])
-          && shortStr(request.resource.data.displayName, 60)
-          && shortStr(request.resource.data.wishlist, 2000);
-        allow delete: if (signedIn() && me() == uid && eventData(eid).status == 'open')
-          || isAdmin(eid);
-      }
-
-      // Organizer-only settings (the blacklist).
+      // Organizer-only settings (the never-pair list).
       match /admin/{doc} {
         allow read, write: if isAdmin(eid);
       }
 
-      // Who you give to. Only you can read yours — not the organizer,
-      // not anyone else. The organizer can only write/clear them.
-      match /assignments/{uid} {
-        allow get: if signedIn() && me() == uid;
-        allow create, update, delete: if isAdmin(eid);
+      // "Person X has opened their match." Public so the picker can grey out
+      // opened names. Can be created exactly once per person per draw, and
+      // only the organizer can clear it to let someone open again.
+      match /claims/{pid} {
+        allow read: if true;
+        allow create: if signedIn()
+          && request.resource.data.uid == me()
+          && eventData(eid).status == 'drawn'
+          && request.resource.data.round == eventData(eid).drawRound;
+        allow delete: if isAdmin(eid);
       }
-    }
 
-    // Per-user list of groups they've joined, for the home screen.
-    match /users/{uid}/memberships/{eid} {
-      allow read, write: if signedIn() && me() == uid;
+      // Who each person gives to. Readable by the organizer (to resend) and by
+      // whoever claimed that person, from the device that claimed it.
+      match /matches/{pid} {
+        allow get: if isAdmin(eid)
+          || (signedIn() && exists(claimPath(eid, pid)) && get(claimPath(eid, pid)).data.uid == me());
+        allow list, create, update, delete: if isAdmin(eid);
+      }
     }
   }
 }

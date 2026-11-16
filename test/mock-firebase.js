@@ -3,13 +3,15 @@ const store = new Map();
 const listeners = new Set();
 let authCbs = [], current = null;
 const clone = (o) => JSON.parse(JSON.stringify(o));
+window.__logout = () => window.__login(null);
 const notify = () => queueMicrotask(() => listeners.forEach((l) => l.fire()));
 export const initializeApp = () => ({});
 export const getAuth = () => ({});
 export const getFirestore = () => ({});
 export const onAuthStateChanged = (_a, cb) => { authCbs.push(cb); setTimeout(() => cb(current), 0); return () => {}; };
-window.__login = (uid, name) => { current = uid ? { uid, displayName: name, email: uid + "@test" } : null; authCbs.forEach((cb) => cb(current)); };
+window.__login = (uid, name, anon = false) => { current = uid ? { uid, displayName: name, email: anon ? null : uid + "@test", isAnonymous: anon } : null; authCbs.forEach((cb) => cb(current)); };
 export class GoogleAuthProvider {}
+export const signInAnonymously = async () => { window.__login("anon" + Math.random().toString(36).slice(2, 7), null, true); return { user: current }; };
 export const signInWithPopup = async () => window.__login("g1", "Google User");
 export const signInWithEmailAndPassword = async (_a, e) => window.__login(e, e);
 export const createUserWithEmailAndPassword = async (_a, e) => { window.__login(e, e); return { user: current }; };
@@ -32,7 +34,8 @@ const colDocs = (q) => [...store.keys()].filter((k) => k.startsWith(q.path + "/"
   .filter((k) => q.filters.every(({ f, op, v }) => op === "==" && store.get(k)[f] === v))
   .map((k) => ({ id: k.split("/").pop(), data: () => clone(store.get(k)) }));
 export const getDoc = async (r) => docSnap(r.path);
-export const setDoc = async (r, d) => { store.set(r.path, clone(d)); notify(); };
+export const setDoc = async (r, d) => {
+  if (r.path.includes("/claims/") && store.has(r.path)) throw Object.assign(new Error("denied"), { code: "permission-denied" }); store.set(r.path, clone(d)); notify(); };
 export const updateDoc = async (r, d) => { if (!store.has(r.path)) throw new Error("no doc " + r.path); store.set(r.path, { ...store.get(r.path), ...clone(d) }); notify(); };
 export const deleteDoc = async (r) => { store.delete(r.path); notify(); };
 export function onSnapshot(r, cb) {

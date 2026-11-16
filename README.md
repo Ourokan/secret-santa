@@ -4,8 +4,9 @@ Live site: https://ourokan.github.io/secret-santa/
 
 A whimsical Secret Santa web app with a Santa shiba mascot.
 
-- **Sign up** with Google or email, create an exchange, and share the invite link.
-- **Anonymous matches:** each person can only read their own assignment, enforced by Firestore security rules. Not even the organizer can see who got whom.
+- **Only the organizer signs in.** They type in the names, then share one link.
+- **Pick your name, open once:** people tap their name and see their match one time, with a reminder to screenshot it. The one-time lock is enforced by Firestore security rules (participants get a silent anonymous session).
+- **Saved for the organizer:** matches stay in the database, so the organizer can show a person's match, copy a ready-to-text message, or let them open it again.
 - **Never-pair list:** block pairs (both directions, or one way) so partners or housemates don't draw each other.
 - **Multiple gifts per person:** set *k*, and everyone gives exactly *k* gifts and receives exactly *k*. The draw is balanced, never self-assigns, never repeats a recipient, and avoids A↔B swaps when possible.
 
@@ -15,7 +16,7 @@ A whimsical Secret Santa web app with a Santa shiba mascot.
 | --- | --- |
 | Static front end (vanilla JS modules) | `public/`, deployed to GitHub Pages by `.github/workflows/pages.yml` |
 | Matching algorithm (b-matching via augmenting paths, then edge-swap shuffling) | `public/match.js`, tested by `test/match.test.mjs` |
-| Auth + database | Firebase project `secret-santa-ourokan` (Auth + Firestore) |
+| Auth + database | Firebase project `secret-santa-ourokan` (Auth: Google, email, anonymous + Firestore) |
 | Security rules | `firestore.rules` |
 
 The Firebase SDK is bundled at build time (`npm run build` → `public/vendor/firebase.js`).
