@@ -302,3 +302,7 @@ button.berry:active { transform: translateY(3px); box-shadow: 0 1px 0 #7a1724; }
 .rename { flex-basis: 100%; display: flex; gap: 8px; }
 .rename input { flex: 1; }
 @media (max-width: 600px) { .waiting .bubble { display: none; } }
+
+.brand-mark { width: 46px; height: 46px; animation: none; margin: -8px 0 -6px; }
+.brand-mark svg { display: block; overflow: visible; }
+.brand:hover .brand-mark .shiba-head { animation: tilt .8s ease-in-out infinite; }

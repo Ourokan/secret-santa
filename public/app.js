@@ -6,9 +6,14 @@ import {
 } from "./vendor/firebase.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { drawMatches, diagnose } from "./match.js";
-import { mascot, startSnow, addLights, confetti, drawCeremony } from "./festive.js";
+import { mascot, shibaSVG, startSnow, addLights, confetti, drawCeremony } from "./festive.js";
 
 startSnow();
+document.querySelector(".brand-mark").innerHTML = shibaSVG({ size: 46, label: "" });
+try {
+  const fav = document.querySelector("link[rel=icon]");
+  fav.href = "data:image/svg+xml," + encodeURIComponent(shibaSVG({ size: 64 }).trim().replace(/<svg /, '<svg xmlns="http://www.w3.org/2000/svg" '));
+} catch {}
 addLights(document.getElementById("topbar"));
 
 const fb = initializeApp(firebaseConfig);
