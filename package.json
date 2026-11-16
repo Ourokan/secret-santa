@@ -1,0 +1,13 @@
+{
+  "name": "secret-santa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/firebase-entry.js --bundle --format=esm --minify --outfile=public/vendor/firebase.js",
+    "test": "node test/match.test.mjs"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "firebase": "^13.3.0"
+  }
+}

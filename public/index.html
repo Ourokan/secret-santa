@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Secret Santa</title>
+  <meta name="description" content="Sign up, get matched anonymously, and keep the surprise." />
+  <meta name="theme-color" content="#123026" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar" id="topbar">
+    <a href="./" class="brand" id="brand"><span class="brand-mark">🎅</span> Secret Santa</a>
+    <div id="account"></div>
+  </header>
+  <main id="app" aria-live="polite">
+    <div class="loading"><div class="spinner"></div></div>
+  </main>
+  <svg class="hills" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 60 Q180 10 360 50 T720 45 T1080 40 T1440 50 V90 H0Z" fill="#e9f1ee"/>
+    <path d="M0 75 Q240 35 480 70 T960 65 T1440 70 V90 H0Z" fill="#ffffff"/>
+  </svg>
+  <div id="toasts" role="status"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
